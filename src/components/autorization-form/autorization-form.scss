@@ -1,0 +1,20 @@
+.autorization-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    button {
+        color: #ffffff;
+        height: 40px;
+        border: none;
+        background-color: #579b14;
+        color: #ffffff;
+        outline: none;
+        border-radius: 2px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    input {
+        outline: none;
+    }
+}

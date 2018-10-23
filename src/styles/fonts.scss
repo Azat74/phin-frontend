@@ -1,0 +1,16 @@
+/* Your custom fonts here */
+
+/* Example
+
+@include font-face('Open Sans', '../fonts/OpenSans-Italic', normal, italic, $exts: woff woff2 ttf);
+
+// Var for using custom font
+$font-1: 'Open Sans', Helvetica, Arial, sans-serif;
+*/
+
+@include font-face('Montserrat Alternates', 'assets/fonts/montserrat-alternates/regular', normal, normal, $exts: ttf);
+@include font-face('Montserrat Alternates', 'assets/fonts/montserrat-alternates/bold', bold, normal, $exts: ttf);
+@include font-face('Montserrat Alternates', 'assets/fonts/montserrat-alternates/italic', normal, italic, $exts: ttf);
+@include font-face('Montserrat Alternates', 'assets/fonts/montserrat-alternates/bolditalic', bold, italic, $exts: ttf);
+
+$ms-a: 'Montserrat Alternates', sans-serif;
