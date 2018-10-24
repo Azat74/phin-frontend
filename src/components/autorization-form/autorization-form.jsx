@@ -2,9 +2,10 @@ import React, {Component} from 'react'
 
 export default class AutorizationForm extends Component {
   state = {
-    email: 'testing3@mail.com',
+    email: `t${Date.now()}@mail.com`,
     password: 'test1234',
-    phone: '+7999999999'
+    phone: '+7999999999',
+    token: ''
   }
   submit = () => {
     const body = {
@@ -14,6 +15,7 @@ export default class AutorizationForm extends Component {
     }
     const myHeaders = new Headers()
     myHeaders.append('Content-type', 'application/json')
+    console.log(JSON.stringify(body));
     fetch('http://localhost:3000/signup', {
       method: 'POST',
       body: JSON.stringify(body),
@@ -28,6 +30,45 @@ export default class AutorizationForm extends Component {
       .then(res => {
         if (res) {
           console.log(res)
+          console.log(JSON.stringify({
+            email: body.email,
+            confirmCode: `${res.confirmCode}`
+          }))
+          fetch('http://localhost:3000/confirmation', {
+            method: 'POST',
+            body: JSON.stringify({
+              email: body.email,
+              confirmCode: `${res.confirmCode}`
+            }),
+            headers: myHeaders
+          })
+            .then(res => {
+              console.log(res)
+              console.log(JSON.stringify({email: body.email, password: body.password}))
+              if (res.status === 200) {
+                fetch('http://localhost:3000/login', {
+                  method: 'POST',
+                  body: JSON.stringify({
+                    email: body.email,
+                    password: body.password
+                  }),
+                  headers: myHeaders
+                })
+                  .then(res => {
+                    console.log(res)
+                    if (res.status === 200) {
+                      return res.text()
+                    }
+                  })
+                  .then(res => {
+                    this.setState(() => {
+                      return {
+                        token: res
+                      }
+                    })
+                  })
+              }
+            })
         }
       })
       .catch(e => console.error(e))
