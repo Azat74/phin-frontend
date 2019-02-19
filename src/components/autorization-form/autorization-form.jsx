@@ -15,8 +15,8 @@ export default class AutorizationForm extends Component {
     }
     const myHeaders = new Headers()
     myHeaders.append('Content-type', 'application/json')
-    console.log(JSON.stringify(body));
-    fetch('http://localhost:3000/signup', {
+    console.log(JSON.stringify(body))
+    window.fetch('http://localhost:3000/signup', {
       method: 'POST',
       body: JSON.stringify(body),
       headers: myHeaders
@@ -24,7 +24,7 @@ export default class AutorizationForm extends Component {
       .then(response => {
         console.log(response)
         if (response.status === 200) {
-          return response.json()
+          return response.json();
         }        
       })
       .then(res => {
@@ -34,7 +34,7 @@ export default class AutorizationForm extends Component {
             email: body.email,
             confirmCode: `${res.confirmCode}`
           }))
-          fetch('http://localhost:3000/confirmation', {
+          window.fetch('http://localhost:3000/confirmation', {
             method: 'POST',
             body: JSON.stringify({
               email: body.email,
@@ -46,7 +46,7 @@ export default class AutorizationForm extends Component {
               console.log(res)
               console.log(JSON.stringify({email: body.email, password: body.password}))
               if (res.status === 200) {
-                fetch('http://localhost:3000/login', {
+                window.fetch('http://localhost:3000/login', {
                   method: 'POST',
                   body: JSON.stringify({
                     email: body.email,
@@ -61,7 +61,9 @@ export default class AutorizationForm extends Component {
                     }
                   })
                   .then(res => {
+                    console.log(res)
                     this.setState(() => {
+                      this.props.toggleLogin()
                       return {
                         token: res
                       }
