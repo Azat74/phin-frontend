@@ -1,4 +1,6 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
+const axios = require('axios')
+const axios2 = require('axios')
 
 export default class AutorizationForm extends Component {
   state = {
@@ -8,6 +10,68 @@ export default class AutorizationForm extends Component {
     token: ''
   }
   submit = () => {
+    const body = {
+      email: this.state.email,
+      password: this.state.password,
+      phone: this.state.phone
+    }
+    const myHeaders = new Headers()
+    myHeaders.append('Content-type', 'application/json')
+    const JSONHeader = {'Content-type': 'application/json'};
+    console.log(JSON.stringify(body))
+    axios({
+      method: 'post',
+      url: 'http://localhost:3000/signup',
+      headers: JSONHeader,
+      data: JSON.stringify(body)
+    })
+      .then(response => {
+        if (response.status === 200) {
+          const thisReturn = JSON.parse(response.request.response)
+          return thisReturn
+        }
+      })
+      .then(confirmCode => {
+        console.log(confirmCode)
+        const requestBody = JSON.stringify({
+          email: body.email,
+          confirmCode: `${confirmCode.confirmCode}`
+        })
+        console.log(requestBody)
+        axios({
+          method: 'post',
+          url: 'http://localhost:3000/confirmation',
+          headers: JSONHeader,
+          data: requestBody
+        })
+          .then(res => {
+            console.log(res)
+            if (res.status === 200) {
+              const requestBody = JSON.stringify({email: body.email, password: body.password});
+              console.log(requestBody)
+              axios({
+                method: 'post',
+                url: 'http://localhost:3000/login',
+                headers: JSONHeader,
+                data: requestBody
+              })
+                .then(res => {
+                  console.log(res);
+                  if (res.status === 200) {
+                    console.log(res.data)
+                    this.setState(() => {
+                      this.props.toggleLogin()
+                      return {
+                        token: res
+                      }
+                    })
+                  }
+                })
+            }
+          })
+      })
+  }
+  submit1 = () => {
     const body = {
       email: this.state.email,
       password: this.state.password,
@@ -25,7 +89,7 @@ export default class AutorizationForm extends Component {
         console.log(response)
         if (response.status === 200) {
           return response.json();
-        }        
+        }
       })
       .then(res => {
         if (res) {
@@ -44,7 +108,7 @@ export default class AutorizationForm extends Component {
           })
             .then(res => {
               console.log(res)
-              console.log(JSON.stringify({email: body.email, password: body.password}))
+              console.log(JSON.stringify({ email: body.email, password: body.password }))
               if (res.status === 200) {
                 window.fetch('http://localhost:3000/login', {
                   method: 'POST',
@@ -77,22 +141,22 @@ export default class AutorizationForm extends Component {
   }
   handleChangeEmail = e => {
     const email = e.target.value
-    this.setState(() => {return {email}})
+    this.setState(() => { return { email } })
   }
   handleChangePassword = e => {
     const password = e.target.value
-    this.setState(() => {return {password}})
+    this.setState(() => { return { password } })
   }
   handleChangePhone = e => {
     const tel = e.target.value
-    this.setState(() => {return {tel}})
+    this.setState(() => { return { tel } })
   }
-  render () {
+  render() {
     return (
       <div className='autorization-form'>
-        <input type='email' defaultValue={this.state.email} onChange={this.handleChangeEmail}/>
-        <input type='password' defaultValue={this.state.password} onChange={this.handleChangePassword}/>
-        <input type='tel' defaultValue={this.state.phone} onChange={this.handleChangePhone}/>
+        <input type='email' defaultValue={this.state.email} onChange={this.handleChangeEmail} />
+        <input type='password' defaultValue={this.state.password} onChange={this.handleChangePassword} />
+        <input type='tel' defaultValue={this.state.phone} onChange={this.handleChangePhone} />
         <button onClick={this.submit}>submit</button>
       </div>
     )
