@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import ErrorNode from '../error-node/error-node'
 const axios = require('axios')
 
 export default class AutorizationForm extends Component {
@@ -7,16 +8,17 @@ export default class AutorizationForm extends Component {
     password: '',
     phone: '',
     reg: false,
+    error: false,
     token: ''
   }
-  submit = async () => {
+  submit = async e => {
+    e.preventDefault()
     const body = {
       email: this.state.email,
       password: this.state.password,
       phone: this.state.phone
     }
     const JSONHeader = { 'Content-type': 'application/json' };
-    console.log(JSON.stringify(body))
     // registration and get ConfirmCode
     function registration() {
       return new Promise((pResolve) => {
@@ -35,6 +37,7 @@ export default class AutorizationForm extends Component {
           })
       })
     }
+    // send ConfirmCode
     async function confirmation() {
       const getConfirmationCode = await registration()
       return new Promise((pResolve) => {
@@ -57,6 +60,7 @@ export default class AutorizationForm extends Component {
     if (this.state.reg === true) {
       await confirmation()
     }
+    // login form
     axios({
       method: 'post',
       url: 'http://localhost:3000/login',
@@ -66,15 +70,16 @@ export default class AutorizationForm extends Component {
       })
     })
       .then(res => {
+        console.log(res)
         if (res.status === 200) {
           console.log(res.data)
-          this.setState(() => {
-            this.props.toggleLogin()
-            return {
-              token: res
-            }
-          })
+          this.props.toggleLogin()
+          this.props.setToken(res.data)
         }
+      })
+      .catch(e => {
+        console.log(e)
+        console.log('Неверный логин или пароль')
       })
   }
   handleChangeEmail = e => {
@@ -92,21 +97,22 @@ export default class AutorizationForm extends Component {
   handleRegActivate = e => {
     e.preventDefault()
     this.setState(state => {
-      { return { ...state, reg: true } }
+      return { ...state, reg: true }
     })
   }
   render() {
     let inputTel = null
     if (this.state.reg === true) {
-      inputTel = <input type='tel' defaultValue={this.state.phone} onChange={this.handleChangePhone} />
+      inputTel = <input required type='tel' defaultValue={this.state.phone} onChange={this.handleChangePhone} />
     }
     return (
       <div className='autorization-form'>
-        <form onSubmit={e => e.preventDefault()}>
-          <input type='email' defaultValue={this.state.email} onChange={this.handleChangeEmail} />
-          <input type='password' defaultValue={this.state.password} onChange={this.handleChangePassword} />
+        <ErrorNode error={'Неправильный логин или пароль'}/>
+        <form onSubmit={this.submit}>
+          <input required type='email' defaultValue={this.state.email} onChange={this.handleChangeEmail} />
+          <input required type='password' defaultValue={this.state.password} onChange={this.handleChangePassword} />
           {inputTel}
-          <button onClick={this.submit}>submit</button>
+          <button>submit</button>
         </form>
         <a href="/registration" onClick={this.handleRegActivate}>Еще не зарегестрированы?</a>
       </div>

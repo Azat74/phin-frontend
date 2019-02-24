@@ -1,0 +1,23 @@
+.night-toggler {
+    position: absolute;
+    right: 10%;
+    top: 10%;
+    width: 40px;
+    height: 20px;
+    border-radius: 2px;
+    background-color: #232323;
+    padding: 0;
+    border: 0;
+    color: #ffffff;
+    &:before {
+        content: 'night'
+    }
+    &.active {
+        background-color: white;
+        color: #232323;
+        &:before {
+            content: 'day'
+        }
+    }
+    
+}
