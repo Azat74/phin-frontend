@@ -21,6 +21,7 @@ export default class AutorizationForm extends Component {
     const JSONHeader = { 'Content-type': 'application/json' };
     // registration and get ConfirmCode
     function registration() {
+      console.log('1')
       return new Promise((pResolve) => {
         axios({
           method: 'post',
@@ -30,6 +31,7 @@ export default class AutorizationForm extends Component {
         })
           .then(response => {
             if (response.status === 200) {
+              
               const thisReturn = JSON.parse(response.request.response)
               console.log(thisReturn.confirmCode)
               pResolve(thisReturn.confirmCode)
@@ -80,6 +82,12 @@ export default class AutorizationForm extends Component {
       .catch(e => {
         console.log(e)
         console.log('Неверный логин или пароль')
+        this.setState(state => {
+          return {
+            ...state,
+            error: true
+          }
+        })
       })
   }
   handleChangeEmail = e => {
@@ -103,14 +111,18 @@ export default class AutorizationForm extends Component {
   render() {
     let inputTel = null
     if (this.state.reg === true) {
-      inputTel = <input required type='tel' defaultValue={this.state.phone} onChange={this.handleChangePhone} />
+      inputTel = <input placeholder='tel' required type='tel' defaultValue={this.state.phone} onChange={this.handleChangePhone} />
+    }
+    let errorNode = null
+    if (this.state.error === true) {
+      errorNode = <ErrorNode errorMsg={'Неправильный логин или пароль'}/>
     }
     return (
       <div className='autorization-form'>
-        <ErrorNode error={'Неправильный логин или пароль'}/>
+        {errorNode}
         <form onSubmit={this.submit}>
-          <input required type='email' defaultValue={this.state.email} onChange={this.handleChangeEmail} />
-          <input required type='password' defaultValue={this.state.password} onChange={this.handleChangePassword} />
+          <input placeholder='email' required type='email' defaultValue={this.state.email} onChange={this.handleChangeEmail} />
+          <input placeholder='password' required type='password' defaultValue={this.state.password} onChange={this.handleChangePassword} />
           {inputTel}
           <button>submit</button>
         </form>
